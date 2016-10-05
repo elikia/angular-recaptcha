@@ -1,7 +1,7 @@
 /**
- * angular-recaptcha build:2016-07-19 
- * https://github.com/vividcortex/angular-recaptcha 
- * Copyright (c) 2016 VividCortex 
+ * @license angular-recaptcha build:2016-10-05
+ * https://github.com/vividcortex/angular-recaptcha
+ * Copyright (c) 2016 VividCortex
 **/
 
 /*global angular, Recaptcha */
@@ -134,6 +134,17 @@
                 }
             }
 
+            function loadScript(url, callback){
+                var head = document.getElementsByTagName('head')[0];
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = url;
+                script.onreadystatechange = callback;
+                script.onload = callback;
+                head.appendChild(script);
+                return script;
+            }
+
 
             // Check if grecaptcha is not defined already.
             if (ng.isDefined($window.grecaptcha)) {
@@ -189,6 +200,38 @@
                     validateRecaptchaInstance();
 
                     return recaptcha.getResponse(widgetId);
+                },
+
+                /**
+                 * Gets the response from the reCaptcha widget.
+                 *
+                 *  
+                 * @param lang  the DOM element where to put the captcha
+                 *
+                 * @returns {String}
+                 */
+
+                changeLanguage:function(lang){
+                    var language=lang.split('-')[0].split('_')||'en';
+
+                    var element=document.getElementById(elemntID);
+                        if(angular.element(element).length===0){
+                        return false;
+                    }
+
+                    if($rootScope.addedScript){
+                        angular.element($rootScope.addedScript).remove();
+                    }
+
+                    angular.element(element).empty();
+                
+                    var url='https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit&hl='+language;
+
+                    $rootScope.addedScript=loadScript(url,function(){
+                        return getRecaptcha().then(function (recaptcha) {
+                            return recaptcha.render(elm, conf);
+                        });
+                    });
                 }
             };
 
