@@ -14,6 +14,7 @@
     app.provider('vcRecaptchaService', function(){
         var provider = this;
         var config = {};
+        var g_element='';
         provider.onLoadFunctionName = 'vcRecaptchaApiLoaded';
 
         /**
@@ -147,7 +148,7 @@
                  * @throws NoKeyException    if no key is provided in the provider config or the directive instance (via attribute)
                  */
                 create: function (elm, conf) {
-
+                    g_element=elm;
                     conf.sitekey = conf.key || config.key;
                     conf.theme = conf.theme || config.theme;
                     conf.stoken = conf.stoken || config.stoken;
@@ -200,7 +201,7 @@
                 changeLanguage:function(lang){
                     var language=lang.split('-')[0].split('_')||'en';
 
-                    var element=document.getElementById(elemntID);
+                    var element=document.getElementById(g_element);
                         if(angular.element(element).length===0){
                         return false;
                     }
@@ -215,7 +216,7 @@
 
                     $rootScope.addedScript=loadScript(url,function(){
                         return getRecaptcha().then(function (recaptcha) {
-                            return recaptcha.render(elm, conf);
+                            return recaptcha.render(g_element,conf);
                         });
                     });
                 }
